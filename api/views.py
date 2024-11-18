@@ -5,6 +5,8 @@ from .models import *
 from django.contrib.auth.models import User
 from .serializer import *
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics
+
 # Create your views here.
 @swagger_auto_schema(
         method='post',
@@ -25,3 +27,14 @@ def cr_user(request):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
+class cr_infromation(generics.ListCreateAPIView):
+    queryset = UserInformation.objects.all()
+    serializer_class = UserInfoSerializer
+    # parser_classes = [MultiPartParser, JSONParser]
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
