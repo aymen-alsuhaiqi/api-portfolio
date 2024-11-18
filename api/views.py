@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from .serializer import *
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics
+import jwt,datetime
 
 # Create your views here.
 @swagger_auto_schema(
@@ -38,3 +39,32 @@ class cr_infromation(generics.ListCreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+@api_view(['POST'])
+def login(request):
+    if request.method == 'POST':
+        data = request.data
+        username = data.get('username')
+        print("__🔻🔻🔻__ ~ file: views.py:47 ~ username:", username)
+        password = data.get('password')
+        print("__🔻🔻🔻__ ~ file: views.py:48 ~ password:", password)
+        user = User.objects.get(username=username)
+        print("__🔻🔻🔻__ ~ file: views.py:51 ~ user:", user.password)
+        if user and user.check_password(password):
+            paylod = {
+                'id':user.pk,
+                'username':user.username,
+                # 'date':datetime.datetime.now(),
+                # 'exp': datetime.datetime.now() + datetime.timedelta(days=1),
+            }
+            token = jwt.encode(paylod,'secret','HS256')
+            print("__🔻🔻🔻__ ~ file: views.py:60 ~ token:", token)
+
+            response = Response()
+            response.set_cookie('token',token,httponly=True)
+
+            response.data = {
+                'token':token,
+                'user_id':user.pk,
+            }
+            return response
+        return Response({'error':'Invalid credentials'}, status=401)
