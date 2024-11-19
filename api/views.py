@@ -125,3 +125,31 @@ class ExperienceView(generics.ListCreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
             
+class EducationView(generics.ListCreateAPIView):
+    queryset = Education.objects.all()
+    serializer_class = EducationSerializer
+
+    def create(self,request, *args, **kwargs):
+        serializer = EducationSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            token = request.COOKIES.get('token')
+            
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                user = User.objects.get(id=payload['id'])
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
