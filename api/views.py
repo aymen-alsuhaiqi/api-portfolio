@@ -32,9 +32,29 @@ class cr_infromation(generics.ListCreateAPIView):
     queryset = UserInformation.objects.all()
     serializer_class = UserInfoSerializer
     # parser_classes = [MultiPartParser, JSONParser]
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+    def create(self,request):
+        serializer = ExperienceSerializer(data=request.data)
+        
         if serializer.is_valid():
+            token = request.COOKIES.get('token')
+            
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                if request.data['user_id'] == payload['id']:
+                    user = User.objects.get(id=payload['id'])
+                else:
+                    return Response({'error': 'User not found'}, status=404)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
@@ -73,7 +93,7 @@ class SkillsView(generics.ListCreateAPIView):
     queryset = Skill.objects.all()
     serializer_class = SkillSerializer
 
-    def create(self,request, *args, **kwargs):
+    def create(self,request):
         serializer = SkillSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -90,7 +110,10 @@ class SkillsView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                user = User.objects.get(id=payload['id'])
+                if request.data['user_id'] == payload['id']:
+                    user = User.objects.get(id=payload['id'])
+                else:
+                    return Response({'error': 'User not found'}, status=404)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
             serializer.save()
@@ -101,7 +124,7 @@ class ExperienceView(generics.ListCreateAPIView):
     queryset = Experience.objects.all()
     serializer_class = ExperienceSerializer
 
-    def create(self,request, *args, **kwargs):
+    def create(self,request):
         serializer = ExperienceSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -118,7 +141,10 @@ class ExperienceView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                user = User.objects.get(id=payload['id'])
+                if request.data['user_id'] == payload['id']:
+                    user = User.objects.get(id=payload['id'])
+                else:
+                    return Response({'error': 'User not found'}, status=404)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
             serializer.save()
@@ -129,7 +155,7 @@ class EducationView(generics.ListCreateAPIView):
     queryset = Education.objects.all()
     serializer_class = EducationSerializer
 
-    def create(self,request, *args, **kwargs):
+    def create(self,request):
         serializer = EducationSerializer(data=request.data)
         
         if serializer.is_valid():
@@ -146,10 +172,43 @@ class EducationView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                user = User.objects.get(id=payload['id'])
+                if request.data['user_id'] == payload['id']:
+                    user = User.objects.get(id=payload['id'])
+                else:
+                    return Response({'error': 'User not found'}, status=404)
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+class WorkView(generics.ListCreateAPIView):
+    queryset = Works.objects.all()
+    serializer_class = WorkSerializer
+
+    def create(self,request):
+        serializer = WorkSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            token = request.COOKIES.get('token')
+            
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                if request.data['user_id'] == payload['id']:
+                    user = User.objects.get(id=payload['id'])
+                else:
+                    return Response({'error': 'User not found'}, status=404)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
