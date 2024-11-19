@@ -5,7 +5,7 @@ from .models import *
 from django.contrib.auth.models import User
 from .serializer import *
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import generics
+from rest_framework import generics,status
 import jwt,datetime
 from rest_framework.exceptions import ValidationError
 
@@ -335,3 +335,13 @@ class WorkView(generics.ListCreateAPIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+    
+@api_view(['GET'])
+def logout(request):
+    try:
+        token = request.COOKIES['token']
+    except Exception as e:
+        return Response({'error': 'Invalid token'}, status=401)
+    response = Response({'message': 'Logged out successfully'},status=status.HTTP_200_OK)
+    response.delete_cookie('token')
+    return response
