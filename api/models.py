@@ -13,8 +13,8 @@ class UserInformation(models.Model):
     age = models.IntegerField()
     country = models.CharField(max_length=25)
     freelancer = models.BooleanField(default=False)
-    image = models.ImageField(upload_to='user/profile/')
-    banner = models.ImageField(upload_to='user/banner/')
+    image = models.ImageField(upload_to='user/profile/',blank=True,null=True)
+    banner = models.ImageField(upload_to='user/banner/',blank=True,null=True)
 
     def __str__(self):
         return self.full_name
@@ -43,7 +43,7 @@ class Experience(models.Model):
     company_name = models.CharField(max_length=100)
     position = models.CharField(max_length=50)
     period = models.CharField(max_length=50)
-    details = models.CharField(max_length=50)
+    details = models.CharField(max_length=250,blank=True)
 
     def __str__(self):
         return self.company_name
