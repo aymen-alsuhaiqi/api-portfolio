@@ -9,7 +9,6 @@ class UserInformation(models.Model):
     address = models.CharField(max_length=200)
     job = models.CharField(max_length=30)
     phone_number = models.CharField(max_length=15)
-    email = models.CharField(max_length=100)
     summary = models.CharField(max_length=250)
     age = models.IntegerField()
     country = models.CharField(max_length=25)
