@@ -8,7 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics,status
 import jwt,datetime
 from rest_framework.exceptions import ValidationError
-
+from rest_framework import serializers
 
 # Create your views here.
 @swagger_auto_schema(
@@ -60,7 +60,7 @@ class cr_infromation(generics.ListCreateAPIView):
         return Response(serializer.data)
     
     def create(self,request):
-        serializer = ExperienceSerializer(data=request.data)
+        serializer = UserInfoSerializer(data=request.data)
         
         if serializer.is_valid():
             token = request.COOKIES.get('token')
@@ -86,13 +86,29 @@ class cr_infromation(generics.ListCreateAPIView):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=100)
+    password = serializers.CharField(max_length=100)
+# class Token(serializers.Serializer):
+#     token = serializers.CharField(max_length=100)
+    
+
+@swagger_auto_schema(
+        method='post',
+        request_body=LoginSerializer,
+        # responses={
+        #     status.HTTP_200_OK: Token,}
+)
 @api_view(['POST'])
 def login(request):
     if request.method == 'POST':
         data = request.data
         username = data.get('username')
         password = data.get('password')
-        user = User.objects.get(username=username)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error':'User not found'}, status=status.HTTP_401_UNAUTHORIZED)
         if user and user.check_password(password):
             paylod = {
                 'id':user.pk,
@@ -107,8 +123,8 @@ def login(request):
 
             response.data = {
                 'token':token,
-                'user_id':user.pk,
             }
+            response.status_code = 200
             return response
         return Response({'error':'Invalid credentials'}, status=401)
 
