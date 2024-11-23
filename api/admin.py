@@ -4,3 +4,6 @@ from .models import *
 
 admin.site.register(Skill)
 admin.site.register(UserInformation)
+admin.site.register(Education)
+admin.site.register(Experience)
+admin.site.register(Works)
