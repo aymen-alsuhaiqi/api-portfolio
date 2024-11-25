@@ -114,8 +114,8 @@ def login(request):
             paylod = {
                 'id':user.pk,
                 'username':user.username,
-                # 'date':datetime.datetime.now(),
-                # 'exp': datetime.datetime.now() + datetime.timedelta(days=1),
+                'date':str(datetime.datetime.now()),
+                'exp': (datetime.datetime.now() + datetime.timedelta(minutes=60)).timestamp(),
             }
             token = jwt.encode(paylod,'secret','HS256')
 
