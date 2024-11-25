@@ -35,7 +35,9 @@ class cr_infromation(generics.ListCreateAPIView):
     serializer_class = UserInfoSerializer
     # parser_classes = [MultiPartParser, JSONParser]
     def get_queryset(self):
-        token = self.request.COOKIES.get('token')
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
 
         if not token:
             raise ValidationError({'error': 'Token not provided'})
@@ -63,8 +65,9 @@ class cr_infromation(generics.ListCreateAPIView):
         serializer = UserInfoSerializer(data=request.data)
         
         if serializer.is_valid():
-            token = request.COOKIES.get('token')
-            
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
             if not token:
                 return Response({'error': 'Token not provided'}, status=400)
             
@@ -76,12 +79,10 @@ class cr_infromation(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                if int(request.data['user_id']) == int(payload['id']):
-                    user = User.objects.get(id=payload['id'])
-                else:
-                    return Response({'error': 'User not found'}, status=404)
+                user = User.objects.get(id=payload['id'])
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
+            serializer.validated_data['user_id'] = user
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
@@ -103,7 +104,7 @@ class LoginSerializer(serializers.Serializer):
 def login(request):
     if request.method == 'POST':
         data = request.data
-        username = data.get('username')
+        username = data.get('userName')
         password = data.get('password')
         try:
             user = User.objects.get(username=username)
@@ -120,9 +121,10 @@ def login(request):
 
             response = Response()
             response.set_cookie('token',token,httponly=True)
+            # response.headers.
 
             response.data = {
-                'token':token,
+                'data':{'userName':username,'email':user.email,'authority':['user','admin'],'token':token},
             }
             response.status_code = 200
             return response
@@ -133,7 +135,9 @@ class SkillsView(generics.ListCreateAPIView):
     serializer_class = SkillSerializer
 
     def get_queryset(self):
-        token = self.request.COOKIES.get('token')
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
 
         if not token:
             raise ValidationError({'error': 'Token not provided'})
@@ -161,8 +165,9 @@ class SkillsView(generics.ListCreateAPIView):
         serializer = SkillSerializer(data=request.data)
         
         if serializer.is_valid():
-            token = request.COOKIES.get('token')
-            
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
             if not token:
                 return Response({'error': 'Token not provided'}, status=400)
             
@@ -174,12 +179,10 @@ class SkillsView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                if int(request.data['user_id']) == int(payload['id']):
-                    user = User.objects.get(id=payload['id'])
-                else:
-                    return Response({'error': 'User not found'}, status=404)
+                user = User.objects.get(id=payload['id'])
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
+            serializer.validated_data['user_id'] = user
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
@@ -189,7 +192,9 @@ class ExperienceView(generics.ListCreateAPIView):
     serializer_class = ExperienceSerializer
 
     def get_queryset(self):
-        token = self.request.COOKIES.get('token')
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
 
         if not token:
             raise ValidationError({'error': 'Token not provided'})
@@ -217,8 +222,9 @@ class ExperienceView(generics.ListCreateAPIView):
         serializer = ExperienceSerializer(data=request.data)
         
         if serializer.is_valid():
-            token = request.COOKIES.get('token')
-            
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
             if not token:
                 return Response({'error': 'Token not provided'}, status=400)
             
@@ -230,12 +236,10 @@ class ExperienceView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                if int(request.data['user_id']) == int(payload['id']):
-                    user = User.objects.get(id=payload['id'])
-                else:
-                    return Response({'error': 'User not found'}, status=404)
+                user = User.objects.get(id=payload['id'])
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
+            serializer.validated_data['user_id'] = user
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
@@ -245,7 +249,9 @@ class EducationView(generics.ListCreateAPIView):
     serializer_class = EducationSerializer
 
     def get_queryset(self):
-        token = self.request.COOKIES.get('token')
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
 
         if not token:
             raise ValidationError({'error': 'Token not provided'})
@@ -273,8 +279,9 @@ class EducationView(generics.ListCreateAPIView):
         serializer = EducationSerializer(data=request.data)
         
         if serializer.is_valid():
-            token = request.COOKIES.get('token')
-            
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
             if not token:
                 return Response({'error': 'Token not provided'}, status=400)
             
@@ -286,12 +293,10 @@ class EducationView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                if int(request.data['user_id']) == int(payload['id']):
-                    user = User.objects.get(id=payload['id'])
-                else:
-                    return Response({'error': 'User not found'}, status=404)
+                user = User.objects.get(id=payload['id'])
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
+            serializer.validated_data['user_id'] = user
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
@@ -301,7 +306,9 @@ class WorkView(generics.ListCreateAPIView):
     serializer_class = WorkSerializer
 
     def get_queryset(self):
-        token = self.request.COOKIES.get('token')
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
 
         if not token:
             raise ValidationError({'error': 'Token not provided'})
@@ -329,8 +336,9 @@ class WorkView(generics.ListCreateAPIView):
         serializer = WorkSerializer(data=request.data)
         
         if serializer.is_valid():
-            token = request.COOKIES.get('token')
-            
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
             if not token:
                 return Response({'error': 'Token not provided'}, status=400)
             
@@ -342,12 +350,10 @@ class WorkView(generics.ListCreateAPIView):
                 return Response({'error': 'Invalid token'}, status=401)
 
             try:
-                if int(request.data['user_id']) == int(payload['id']):
-                    user = User.objects.get(id=payload['id'])
-                else:
-                    return Response({'error': 'User not found'}, status=404)
+                user = User.objects.get(id=payload['id'])
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=404)
+            serializer.validated_data['user_id'] = user
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)

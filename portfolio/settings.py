@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-b&!y($7y4x6ydzw23=mw%evxqigu^r+2kx0ajzflfc(ozu0e3=
 DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0','*']
-SECURE_SSL_REDIRECT = True
+# SECURE_SSL_REDIRECT = True
 
 
 # Application definition
