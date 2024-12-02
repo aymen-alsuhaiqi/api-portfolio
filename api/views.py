@@ -367,3 +367,346 @@ def logout(request):
     response = Response({'message': 'Logged out successfully'},status=status.HTTP_200_OK)
     response.delete_cookie('token')
     return response
+class SkillViewUD(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SkillSerializer
+    queryset = Skill.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
+
+        if not token:
+            raise ValidationError({'error': 'Token not provided'})
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise ValidationError({'error': 'Token has expired'})
+        except jwt.InvalidTokenError:
+            raise ValidationError({'error': 'Invalid token'})
+
+        try:
+            user = User.objects.get(id=payload['id'])
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'User not found'})
+
+        try:
+            query = Skill.objects.get(id=self.kwargs['id'],user_id=user)
+        except Skill.DoesNotExist:
+            raise ValidationError({'error': 'Skill not found'})
+        return query
+    
+    def get(self, request,id):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=False)
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object() 
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
+
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                user = User.objects.get(id=payload['id'])
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            if 'user_id' in serializer.validated_data:
+                del serializer.validated_data['user_id'] 
+
+            serializer.validated_data['user_id'] = user
+            serializer.save()
+            return Response(serializer.data, status=200)
+        
+        return Response(serializer.errors, status=400)
+
+class ExperienceViewUD(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ExperienceSerializer
+    queryset = Experience.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
+
+        if not token:
+            raise ValidationError({'error': 'Token not provided'})
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise ValidationError({'error': 'Token has expired'})
+        except jwt.InvalidTokenError:
+            raise ValidationError({'error': 'Invalid token'})
+
+        try:
+            user = User.objects.get(id=payload['id'])
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'User not found'})
+
+        try:
+            query = Experience.objects.get(id=self.kwargs['id'],user_id=user)
+        except Experience.DoesNotExist:
+            raise ValidationError({'error': 'Experience not found'})
+        return query
+    
+    def get(self, request,id):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=False)
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object() 
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
+
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                user = User.objects.get(id=payload['id'])
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            if 'user_id' in serializer.validated_data:
+                del serializer.validated_data['user_id'] 
+
+            serializer.validated_data['user_id'] = user
+            serializer.save()
+            return Response(serializer.data, status=200)
+        
+        return Response(serializer.errors, status=400)
+
+class WorkViewUD(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = WorkSerializer
+    queryset = Works.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
+
+        if not token:
+            raise ValidationError({'error': 'Token not provided'})
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise ValidationError({'error': 'Token has expired'})
+        except jwt.InvalidTokenError:
+            raise ValidationError({'error': 'Invalid token'})
+
+        try:
+            user = User.objects.get(id=payload['id'])
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'User not found'})
+
+        try:
+            query = Works.objects.get(id=self.kwargs['id'],user_id=user)
+        except Works.DoesNotExist:
+            raise ValidationError({'error': 'Works not found'})
+        return query
+    
+    def get(self, request,id):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=False)
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object() 
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
+
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                user = User.objects.get(id=payload['id'])
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            if 'user_id' in serializer.validated_data:
+                del serializer.validated_data['user_id'] 
+
+            serializer.validated_data['user_id'] = user
+            serializer.save()
+            return Response(serializer.data, status=200)
+        
+        return Response(serializer.errors, status=400)
+
+class EducationViewUD(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = EducationSerializer
+    queryset = Education.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
+
+        if not token:
+            raise ValidationError({'error': 'Token not provided'})
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise ValidationError({'error': 'Token has expired'})
+        except jwt.InvalidTokenError:
+            raise ValidationError({'error': 'Invalid token'})
+
+        try:
+            user = User.objects.get(id=payload['id'])
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'User not found'})
+
+        try:
+            query = Education.objects.get(id=self.kwargs['id'],user_id=user)
+        except Education.DoesNotExist:
+            raise ValidationError({'error': 'Education not found'})
+        return query
+    
+    def get(self, request,id):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=False)
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object() 
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
+
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                user = User.objects.get(id=payload['id'])
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            if 'user_id' in serializer.validated_data:
+                del serializer.validated_data['user_id'] 
+
+            serializer.validated_data['user_id'] = user
+            serializer.save()
+            return Response(serializer.data, status=200)
+        
+        return Response(serializer.errors, status=400)
+class CRInformationUD(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = UserInfoSerializer
+    queryset = UserInformation.objects.all()
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        token = self.request.headers.get('Authorization')
+        if self.request.COOKIES.get('token'):
+            token = self.request.COOKIES.get('token')
+
+        if not token:
+            raise ValidationError({'error': 'Token not provided'})
+
+        try:
+            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+        except jwt.ExpiredSignatureError:
+            raise ValidationError({'error': 'Token has expired'})
+        except jwt.InvalidTokenError:
+            raise ValidationError({'error': 'Invalid token'})
+
+        try:
+            user = User.objects.get(id=payload['id'])
+        except User.DoesNotExist:
+            raise ValidationError({'error': 'User not found'})
+
+        try:
+            query = UserInformation.objects.get(id=self.kwargs['id'],user_id=user)
+        except UserInformation.DoesNotExist:
+            raise ValidationError({'error': 'UserInformation not found'})
+        return query
+    
+    def get(self, request,id):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=False)
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object() 
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            token = request.headers.get('Authorization')
+            if request.COOKIES.get('token'):
+                token = request.COOKIES.get('token')            
+
+            if not token:
+                return Response({'error': 'Token not provided'}, status=400)
+            
+            try:
+                payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=401)
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token'}, status=401)
+
+            try:
+                user = User.objects.get(id=payload['id'])
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=404)
+
+            if 'user_id' in serializer.validated_data:
+                del serializer.validated_data['user_id'] 
+
+            serializer.validated_data['user_id'] = user
+            serializer.save()
+            return Response(serializer.data, status=200)
+        
+        return Response(serializer.errors, status=400)

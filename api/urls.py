@@ -11,5 +11,10 @@ urlpatterns = [
     path('v1/education',views.EducationView.as_view()),
     path('v1/work',views.WorkView.as_view()),
     path('v1/logout',views.logout),
+    path('v1/skill-ud/<int:id>',views.SkillViewUD.as_view()),
+    path('v1/experience-ud/<int:id>',views.ExperienceViewUD.as_view()),
+    path('v1/work-ud/<int:id>',views.WorkViewUD.as_view()),
+    path('v1/education-ud/<int:id>',views.EducationViewUD.as_view()),
+    path('v1/information-ud/<int:id>',views.CRInformationUD.as_view()),
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
